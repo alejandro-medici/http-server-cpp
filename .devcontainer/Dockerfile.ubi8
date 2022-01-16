@@ -1,0 +1,41 @@
+FROM registry.access.redhat.com/ubi8/ubi:8.1
+
+ARG USERNAME
+ARG PASSWORD
+
+# CodeReady contains packages required for develpers (i.e. imake)
+# Must register system using RHEL subscription in order to access these packages
+RUN subscription-manager register --username ${USERNAME} --password ${PASSWORD} \
+  && yum repolist \
+  && subscription-manager attach --auto \
+  && subscription-manager repos --enable=codeready-builder-for-rhel-8-x86_64-rpms \
+  && yum repolist
+
+RUN INSTALL_PKGS="gcc-toolset-11-gcc gcc-toolset-11-gcc-c++ gcc-toolset-11-gcc-gfortran gcc-toolset-11-gdb" && \
+    yum --disableplugin=subscription-manager install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum --disableplugin=subscription-manager clean all -y
+
+
+USER 1001
+
+# Enable the SCL for all bash scripts.
+ENV BASH_ENV=/opt/app-root/etc/scl_enable \
+    ENV=/opt/app-root/etc/scl_enable \
+    PROMPT_COMMAND=". /opt/app-root/etc/scl_enable"
+
+#FROM registry.access.redhat.com/ubi8/ubi:8.5 as OSBASE
+    
+RUN INSTALL_PKGS="make gcc gcc-c++ zlib-devel bzip2 bzip2-devel git cmake libarchive readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel" && \
+    dnf --disableplugin=subscription-manager install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    dnf --disableplugin=subscription-manager clean all -y
+
+#RUN dnf --disableplugin=subscription-manager -y install wget git python3 yum-utils \
+#  && dnf --disableplugin=subscription-manager clean all
+
+#RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+#    dnf install -y docker-ce docker-ce-cli containerd.io
+
+#RUN wget https://raw.githubusercontent.com/matt-42/lithium/master/cli/li
+#RUN chmod +x li && mv li /usr/bin/

@@ -1,0 +1,12 @@
+{
+    "name": "http_server_in_cpp",
+    "author": "Alejandro Medici",
+    "description": "Yes... C++ works perfect making server",
+    "version": "0.0.1",
+    "scripts": {
+      "build": "mkdir build && cp cmake/* build/ && cd build && cmake . && make",
+      "run": " ./build/lithium_server",
+      "start": "npm run clean && npm run build && npm run run",
+      "clean": "rm -rf build"
+    }
+}
